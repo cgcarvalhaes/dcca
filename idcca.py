@@ -2,7 +2,6 @@ import argparse
 import os
 import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from dcca import dcca
@@ -38,17 +37,16 @@ def progress_bar(cnt, cnt_max, length=50):
     sys.stdout.flush()
 
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs='+', type=valid_input, help="The path to the time series files")
-    parser.add_argument("-o", "--output", type=valid_output, help="Output file to save the results")
+    parser.add_argument("-o", "--output", required=True, type=valid_output, help="Output file to save the results")
     parser.add_argument("-b", "--boxes", nargs="*", type=int, help="A list of specific box sizes to be used in the "\
                                                                    "calculation")
     parser.add_argument("-m", "--max_num_boxes", type=int, default=100, help="Maximum number of boxes")
     parser.add_argument("-d", "--deg", type=int, default=1, help="The polynomial degree to detrend the signals")
     parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity")
     parser.add_argument("-w", "--warnings", action="store_true", help="Output warning messages")
-    parser.add_argument("-p", "--plot", action="store_true", help="Plot the output on the screen")
     args = parser.parse_args()
 
     if len(args.files) == 1:
@@ -72,24 +70,4 @@ def main():
         data = np.stack((box_sizes_list, rho, Fxx, Fyy, Fxy2)).T
         np.savetxt(args.output, data, header="n rho Fxx Fyy Fxy2")
 
-    if not args.output or args.plot:
-        fig, axes = plt.subplots(nrows=2, sharex=True)
-        axes[0].plot(box_sizes_list, Fxx, label="Fx(n)")
-        axes[0].plot(box_sizes_list, Fyy, label="Fy(n)")
-        axes[0].plot(box_sizes_list, Fxy2, label="Fxy2(n)")
-        axes[0].set_xlabel("Box Size (n)")
-        axes[0].text(.5, .9, 'DFA coefficients', horizontalalignment='center', transform=axes[0].transAxes)
-        axes[0].legend(loc='upper left')
-        axes[1].semilogx(box_sizes_list, rho)
-        axes[1].set_xlabel("Box Size (n)")
-        axes[1].text(.5, .9, 'rho_dcca (n)', horizontalalignment='center', transform=axes[1].transAxes)
-        axes[1].axhline(ls="--", color='gray')
-        axes[1].set_ylim([-1, 1])
-        plt.show()
-
     print("\nComplete.")
-
-
-if __name__ == "__main__":
-    rc = main()
-    exit(rc)
