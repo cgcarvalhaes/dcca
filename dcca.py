@@ -1,6 +1,8 @@
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+from progress_bar import progress
+
 
 def detrend(y, x=None, deg=1, axis=0):
     # check arguments.
@@ -62,7 +64,7 @@ def moving_detrend(x, box_size, deg=1):
 
 def fluctuation(x_detrended, y_detrended=None):
     if y_detrended is None:
-        return np.mean(np.std(x_detrended, axis=1))
+        return np.sqrt(np.mean(np.var(x_detrended, axis=1)))
     return np.mean(np.mean(x_detrended * y_detrended, axis=1))
 
 
@@ -147,7 +149,7 @@ def dfa(x, box_sizes_list, ignore_warnings=True, max_num_boxes=100):
     return f
 
 
-def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, verbose_print=None, show_warnings=False):
+def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, show_warnings=False):
     """Estimate the DCCA coefficients for a pair of time series
 
     Parameters
@@ -158,6 +160,7 @@ def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, verbose_print=None
     box_sizes_list: list of ints, optional
         A sequence of box sizes to segment the data for the fluctuation analysis.
         If not given, then it will be set to all values in the range from 4 to data.length/4.
+    deg: degree of polynomial interpolation to detrend the signals
     ignore_warnings: bool, optional
         If warning_filter is True, then all warnings from scipy will be suppressed
 
@@ -174,10 +177,6 @@ def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, verbose_print=None
     flc_xy2: 1-D numpy.ndarray of floats
         The fluctuation coefficients for the product x*y
     """
-
-    if verbose_print is None:
-        def verbose_print(a, b):
-            return None
 
     if not show_warnings:
         # ignore harmless warnings
@@ -208,7 +207,7 @@ def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, verbose_print=None
     flc_xy2 = np.ones_like(flc_x)
     rho = np.ones_like(flc_x)
     for j, n in enumerate(box_sizes_list):
-        verbose_print(j+1, len(box_sizes_list))
+        progress(j+1, len(box_sizes_list))
         # get the detrended arrays for x and y. For convenience, xd and yd are matrices of size (N-n) by n.
         # The kth row of xd is the detrended array for the sequence x_k, ..., k_(k+n)
         xd = moving_detrend(x, n, deg=deg)
