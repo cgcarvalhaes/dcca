@@ -3,4 +3,5 @@
 .idea
 __pycache__
 .git
-Example-checkpoint.ipynb
+.ipynb_checkpoints
+*-checkpoint.ipynb

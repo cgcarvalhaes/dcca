@@ -1,10 +1,11 @@
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
-from progress_bar import progress
-
 
 def detrend(y, x=None, deg=1, axis=0):
+    y = np.asarray(y)
+    if x is not None:
+        x = np.asarray(x)
     # check arguments.
     if deg < 0:
         raise ValueError("expected deg >= 0")
@@ -207,7 +208,7 @@ def dcca(x, y, box_sizes_list=None, max_num_boxes=100, deg=1, show_warnings=Fals
     flc_xy2 = np.ones_like(flc_x)
     rho = np.ones_like(flc_x)
     for j, n in enumerate(box_sizes_list):
-        progress(j+1, len(box_sizes_list))
+        print('%s/%s (%.1f%%) box size %s ' % (j+1, len(box_sizes_list), 100. * (j+1) / len(box_sizes_list), n))
         # get the detrended arrays for x and y. For convenience, xd and yd are matrices of size (N-n) by n.
         # The kth row of xd is the detrended array for the sequence x_k, ..., k_(k+n)
         xd = moving_detrend(x, n, deg=deg)

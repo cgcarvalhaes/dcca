@@ -1,6 +1,5 @@
 import argparse
 import os
-import sys
 
 import numpy as np
 
@@ -59,10 +58,6 @@ if __name__ == "__main__":
     else:
         x = np.loadtxt(args.files[0])
         y = np.loadtxt(args.files[1])
-
-    def verbose_print(a, b):
-        if args.verbose:
-            progress_bar(a, b)
 
     box_sizes_list, rho, Fxx, Fyy, Fxy2 = dcca(x, y,
                                                box_sizes_list=args.boxes,
