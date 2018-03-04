@@ -1,7 +1,6 @@
 *.pyc
 *.log
 .idea
-__pycache__
 .git
 .ipynb_checkpoints
 *-checkpoint.ipynb
